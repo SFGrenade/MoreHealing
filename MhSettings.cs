@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Modding;
+﻿using Modding;
 
 namespace MoreHealing
 {
-    class MhSettings : ModSettings
+    class MhSettings
     {
         // insert default values here
-        public List<bool> gotCharms = new List<bool>() { true, true, true, true };
-        public List<bool> newCharms = new List<bool>() { false, false, false, false };
-        public List<bool> equippedCharms = new List<bool>() { false, false, false, false };
-        public List<int> charmCosts = new List<int>() { 4, 5, 5, 6 };
+        public bool[] gotCharms = new bool[] { true, true, true, true };
+        public bool[] newCharms = new bool[] { false, false, false, false };
+        public bool[] equippedCharms = new bool[] { false, false, false, false };
+        public int[] charmCosts = new int[] { 4, 5, 5, 6 };
     }
 }

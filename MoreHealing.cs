@@ -5,16 +5,18 @@ using System.Reflection;
 using System.Security.Cryptography;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using ModCommon.Util;
 using Modding;
 using MoreHealing.Consts;
 using SFCore;
+using SFCore.Generics;
+using SFCore.Utils;
 using UnityEngine;
 
 namespace MoreHealing
 {
-    class MoreHealing : Mod<MhSettings>
+    class MoreHealing : SaveSettingsMod<MhSettings>
     {
+
         public TextureStrings ts { get; private set; }
         public CharmHelper ch { get; private set; }
 
@@ -51,7 +53,10 @@ namespace MoreHealing
 
             ch = new CharmHelper();
             ch.customCharms = 4;
-            ch.customSprites = new Sprite[] { ts.Get(TextureStrings.QuickerFocusKey), ts.Get(TextureStrings.QuickestFocusKey), ts.Get(TextureStrings.DeeperFocusKey), ts.Get(TextureStrings.DeepestFocusKey) };
+            ch.customSprites = new Sprite[]
+            {
+                ts.Get(TextureStrings.QuickerFocusKey), ts.Get(TextureStrings.QuickestFocusKey), ts.Get(TextureStrings.DeeperFocusKey), ts.Get(TextureStrings.DeepestFocusKey)
+            };
 
             initCallbacks();
 
@@ -60,15 +65,41 @@ namespace MoreHealing
 
         private void initCallbacks()
         {
-            ModHooks.Instance.GetPlayerBoolHook += OnGetPlayerBoolHook;
-            ModHooks.Instance.SetPlayerBoolHook += OnSetPlayerBoolHook;
-            ModHooks.Instance.GetPlayerIntHook += OnGetPlayerIntHook;
-            ModHooks.Instance.AfterSavegameLoadHook += InitSaveSettings;
-            ModHooks.Instance.LanguageGetHook += OnLanguageGetHook;
+            ModHooks.GetPlayerBoolHook += OnGetPlayerBoolHook;
+            ModHooks.SetPlayerBoolHook += OnSetPlayerBoolHook;
+            ModHooks.GetPlayerIntHook += OnGetPlayerIntHook;
+            ModHooks.AfterSavegameLoadHook += InitSaveSettings;
+            ModHooks.LanguageGetHook += OnLanguageGetHook;
             //ModHooks.Instance.CharmUpdateHook += OnCharmUpdateHook;
 
             On.HeroController.Start += OnHeroControllerStart;
+            On.GameManager.Update += GameManagerUpdate;
         }
+
+        #region Mod Reload
+
+        private void GameManagerUpdate(On.GameManager.orig_Update orig, GameManager self)
+        {
+            orig(self);
+
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                AppDomain appDomain = AppDomain.CurrentDomain;
+                Log($"App Domain FriendlyName '{appDomain.FriendlyName}'");
+                Log($"App Domain IsDefaultAppDomain '{appDomain.IsDefaultAppDomain()}'");
+                Log($"App Domain Assemblies:");
+                foreach (var asm in appDomain.GetAssemblies())
+                {
+                    foreach (var mod in asm.GetModules())
+                    {
+                        Log($"Module '{mod.Name}'");
+                    }
+                }
+                AppDomain.Unload(appDomain);
+            }
+        }
+
+        #endregion
 
         private bool changed = false;
         private void OnHeroControllerStart(On.HeroController.orig_Start orig, HeroController self)
@@ -85,10 +116,10 @@ namespace MoreHealing
         {
             // Found in a project, might help saving, don't know, but who cares
             // Charms
-            Settings.gotCharms = Settings.gotCharms;
-            Settings.newCharms = Settings.newCharms;
-            Settings.equippedCharms = Settings.equippedCharms;
-            Settings.charmCosts = Settings.charmCosts;
+            _saveSettings.gotCharms = _saveSettings.gotCharms;
+            _saveSettings.newCharms = _saveSettings.newCharms;
+            _saveSettings.equippedCharms = _saveSettings.equippedCharms;
+            _saveSettings.charmCosts = _saveSettings.charmCosts;
 
             changed = false;
         }
@@ -180,16 +211,20 @@ namespace MoreHealing
             "Quicker Focus",
             "Quickest Focus",
             "Deeper Focus",
-            "Deepest Focus"
+            "Deepest Focus",
+            "Temp",
+            "Temp"
         };
         private string[] charmDescriptions =
         {
             "A dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage even faster.",
             "A very dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage faster than nothing else.",
             "Naturally formed within a crystal over a longer period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will triple.",
-            "Naturally formed within a crystal over the longest period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will quadruple."
+            "Naturally formed within a crystal over the longest period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will quadruple.",
+            "Temp",
+            "Temp"
         };
-        private string OnLanguageGetHook(string key, string sheet)
+        private string OnLanguageGetHook(string key, string sheet, string orig)
         {
             if (key.StartsWith("CHARM_NAME_"))
             {
@@ -207,16 +242,16 @@ namespace MoreHealing
                     return charmDescriptions[ch.charmIDs.IndexOf(charmNum)];
                 }
             }
-            return Language.Language.GetInternal(key, sheet);
+            return orig;
         }
-        private bool OnGetPlayerBoolHook(string target)
+        private bool OnGetPlayerBoolHook(string target, bool orig)
         {
             if (target.StartsWith("gotCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    return Settings.gotCharms[ch.charmIDs.IndexOf(charmNum)];
+                    return _saveSettings.gotCharms[ch.charmIDs.IndexOf(charmNum)];
                 }
             }
             if (target.StartsWith("newCharm_"))
@@ -224,7 +259,7 @@ namespace MoreHealing
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    return Settings.newCharms[ch.charmIDs.IndexOf(charmNum)];
+                    return _saveSettings.newCharms[ch.charmIDs.IndexOf(charmNum)];
                 }
             }
             if (target.StartsWith("equippedCharm_"))
@@ -232,20 +267,20 @@ namespace MoreHealing
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    return Settings.equippedCharms[ch.charmIDs.IndexOf(charmNum)];
+                    return _saveSettings.equippedCharms[ch.charmIDs.IndexOf(charmNum)];
                 }
             }
-            return PlayerData.instance.GetBoolInternal(target);
+            return orig;
         }
-        private void OnSetPlayerBoolHook(string target, bool val)
+        private bool OnSetPlayerBoolHook(string target, bool orig)
         {
             if (target.StartsWith("gotCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    Settings.gotCharms[ch.charmIDs.IndexOf(charmNum)] = val;
-                    return;
+                    _saveSettings.gotCharms[ch.charmIDs.IndexOf(charmNum)] = orig;
+                    return orig;
                 }
             }
             if (target.StartsWith("newCharm_"))
@@ -253,8 +288,8 @@ namespace MoreHealing
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    Settings.newCharms[ch.charmIDs.IndexOf(charmNum)] = val;
-                    return;
+                    _saveSettings.newCharms[ch.charmIDs.IndexOf(charmNum)] = orig;
+                    return orig;
                 }
             }
             if (target.StartsWith("equippedCharm_"))
@@ -262,23 +297,23 @@ namespace MoreHealing
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    Settings.equippedCharms[ch.charmIDs.IndexOf(charmNum)] = val;
-                    return;
+                    _saveSettings.equippedCharms[ch.charmIDs.IndexOf(charmNum)] = orig;
+                    return orig;
                 }
             }
-            PlayerData.instance.SetBoolInternal(target, val);
+            return orig;
         }
-        private int OnGetPlayerIntHook(string target)
+        private int OnGetPlayerIntHook(string target, int orig)
         {
             if (target.StartsWith("charmCost_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
                 if (ch.charmIDs.Contains(charmNum))
                 {
-                    return Settings.charmCosts[ch.charmIDs.IndexOf(charmNum)];
+                    return _saveSettings.charmCosts[ch.charmIDs.IndexOf(charmNum)];
                 }
             }
-            return PlayerData.instance.GetIntInternal(target);
+            return orig;
         }
 
         #endregion
