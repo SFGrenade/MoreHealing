@@ -18,12 +18,12 @@ namespace MoreHealing.Consts
         private const string DeepestFocusFile = "MoreHealing.Resources.DeepestFocus.png";
         #endregion Misc
 
-        private readonly Dictionary<string, Sprite> dict;
+        private readonly Dictionary<string, Sprite> _dict;
 
         public TextureStrings()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
-            dict = new Dictionary<string, Sprite>();
+            _dict = new Dictionary<string, Sprite>();
             Dictionary<string, string> tmpTextures = new Dictionary<string, string>();
             tmpTextures.Add(QuickerFocusKey, QuickerFocusFile);
             tmpTextures.Add(QuickestFocusKey, QuickestFocusFile);
@@ -46,14 +46,14 @@ namespace MoreHealing.Consts
 
                     // Create sprite from texture
                     // Split is to cut off the TestOfTeamwork.Resources. and the .png
-                    dict.Add(t.Key, Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
+                    _dict.Add(t.Key, Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
                 }
             }
         }
 
         public Sprite Get(string key)
         {
-            return dict[key];
+            return _dict[key];
         }
     }
 }

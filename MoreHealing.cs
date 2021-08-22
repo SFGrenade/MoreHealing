@@ -18,8 +18,8 @@ namespace MoreHealing
     class MoreHealing : SaveSettingsMod<MhSettings>
     {
 
-        public TextureStrings ts { get; private set; }
-        public List<int> charmIDs { get; private set; }
+        public TextureStrings Ts { get; private set; }
+        public List<int> CharmIDs { get; private set; }
 
         // Thx to 56
         public override string GetVersion()
@@ -45,21 +45,21 @@ namespace MoreHealing
 
         public MoreHealing() : base("More Healing")
         {
-            ts = new TextureStrings();
+            Ts = new TextureStrings();
         }
 
         public override void Initialize()
         {
             Log("Initializing");
 
-            charmIDs = CharmHelper.AddSprites(ts.Get(TextureStrings.QuickerFocusKey), ts.Get(TextureStrings.QuickestFocusKey), ts.Get(TextureStrings.DeeperFocusKey), ts.Get(TextureStrings.DeepestFocusKey));
+            CharmIDs = CharmHelper.AddSprites(Ts.Get(TextureStrings.QuickerFocusKey), Ts.Get(TextureStrings.QuickestFocusKey), Ts.Get(TextureStrings.DeeperFocusKey), Ts.Get(TextureStrings.DeepestFocusKey));
 
-            initCallbacks();
+            InitCallbacks();
 
             Log("Initialized");
         }
 
-        private void initCallbacks()
+        private void InitCallbacks()
         {
             ModHooks.GetPlayerBoolHook += OnGetPlayerBoolHook;
             ModHooks.SetPlayerBoolHook += OnSetPlayerBoolHook;
@@ -81,30 +81,30 @@ namespace MoreHealing
 
         #endregion
 
-        private bool changed = false;
+        private bool _changed = false;
         private void OnHeroControllerStart(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
-            if (changed) return;
-            changed = true;
+            if (_changed) return;
+            _changed = true;
 
-            self.StartCoroutine(addCharmStates(self));
+            self.StartCoroutine(AddCharmStates(self));
 
-            changed = true;
+            _changed = true;
         }
         private void InitSaveSettings(SaveGameData data)
         {
             // Found in a project, might help saving, don't know, but who cares
             // Charms
-            _saveSettings.gotCharms = _saveSettings.gotCharms;
-            _saveSettings.newCharms = _saveSettings.newCharms;
-            _saveSettings.equippedCharms = _saveSettings.equippedCharms;
-            _saveSettings.charmCosts = _saveSettings.charmCosts;
+            SaveSettings.gotCharms = SaveSettings.gotCharms;
+            SaveSettings.newCharms = SaveSettings.newCharms;
+            SaveSettings.equippedCharms = SaveSettings.equippedCharms;
+            SaveSettings.charmCosts = SaveSettings.charmCosts;
 
-            changed = false;
+            _changed = false;
         }
 
-        private IEnumerator addCharmStates(HeroController self)
+        private IEnumerator AddCharmStates(HeroController self)
         {
             var spellFsm = self.gameObject.LocateMyFSM("Spell Control");
             var spellFsmVar = spellFsm.FsmVariables;
@@ -119,7 +119,7 @@ namespace MoreHealing
             spellFsm.RemoveAction("Set QuickerFocus Speed", 0);
             spellFsm.RemoveAction("Set QuickerFocus Speed", 0);
             spellFsm.RemoveAction("Set QuickerFocus Speed", 2);
-            spellFsm.GetAction<PlayerDataBoolTest>("Set QuickerFocus Speed", 0).boolName = $"equippedCharm_{charmIDs[0]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Set QuickerFocus Speed", 0).boolName = $"equippedCharm_{CharmIDs[0]}";
             spellFsm.AddAction("Set QuickerFocus Speed", fmAction);
             spellFsm.GetAction<FloatMultiply>("Set QuickerFocus Speed", 2).multiplyBy = Mathf.Pow(2f/3f, 2);
 
@@ -127,7 +127,7 @@ namespace MoreHealing
             spellFsm.RemoveAction("Set QuickestFocus Speed", 0);
             spellFsm.RemoveAction("Set QuickestFocus Speed", 0);
             spellFsm.RemoveAction("Set QuickestFocus Speed", 2);
-            spellFsm.GetAction<PlayerDataBoolTest>("Set QuickestFocus Speed", 0).boolName = $"equippedCharm_{charmIDs[1]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Set QuickestFocus Speed", 0).boolName = $"equippedCharm_{CharmIDs[1]}";
             spellFsm.AddAction("Set QuickestFocus Speed", fmAction);
             spellFsm.GetAction<FloatMultiply>("Set QuickestFocus Speed", 2).multiplyBy = Mathf.Pow(2f/3f, 3);
 
@@ -139,11 +139,11 @@ namespace MoreHealing
             #region Deep Focus Speeds
 
             spellFsm.CopyState("Deep Focus Speed", "Deeper Focus Speed");
-            spellFsm.GetAction<PlayerDataBoolTest>("Deeper Focus Speed", 0).boolName = $"equippedCharm_{charmIDs[2]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Deeper Focus Speed", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
             spellFsm.GetAction<FloatMultiply>("Deeper Focus Speed", 1).multiplyBy = Mathf.Pow(1.65f, 2);
 
             spellFsm.CopyState("Deep Focus Speed", "Deepest Focus Speed");
-            spellFsm.GetAction<PlayerDataBoolTest>("Deepest Focus Speed", 0).boolName = $"equippedCharm_{charmIDs[3]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Deepest Focus Speed", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
             spellFsm.GetAction<FloatMultiply>("Deepest Focus Speed", 1).multiplyBy = Mathf.Pow(1.65f, 3);
 
             spellFsm.ChangeTransition("Deep Focus Speed", "FINISHED", "Deeper Focus Speed");
@@ -167,13 +167,13 @@ namespace MoreHealing
             spellFsm.CopyState("Set HP Amount", "Set HP Amount Deeper");
             spellFsm.RemoveAction("Set HP Amount Deeper", 0);
             spellFsm.RemoveAction("Set HP Amount Deeper", 1);
-            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount Deeper", 0).boolName = $"equippedCharm_{charmIDs[2]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount Deeper", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
             spellFsm.AddAction("Set HP Amount Deeper", iaa2);
 
             spellFsm.CopyState("Set HP Amount", "Set HP Amount Deepest");
             spellFsm.RemoveAction("Set HP Amount Deepest", 0);
             spellFsm.RemoveAction("Set HP Amount Deepest", 1);
-            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount Deepest", 0).boolName = $"equippedCharm_{charmIDs[3]}";
+            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
             spellFsm.AddAction("Set HP Amount Deepest", iaa3);
 
             spellFsm.ChangeTransition("Set HP Amount", FsmEvent.Finished.Name, "Set HP Amount Deeper");
@@ -186,7 +186,7 @@ namespace MoreHealing
 
         #region ModHooks
 
-        private string[] charmNames =
+        private string[] _charmNames =
         {
             "Quicker Focus",
             "Quickest Focus",
@@ -195,7 +195,7 @@ namespace MoreHealing
             "Temp",
             "Temp"
         };
-        private string[] charmDescriptions =
+        private string[] _charmDescriptions =
         {
             "A dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage even faster.",
             "A very dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage faster than nothing else.",
@@ -209,17 +209,17 @@ namespace MoreHealing
             if (key.StartsWith("CHARM_NAME_"))
             {
                 int charmNum = int.Parse(key.Split('_')[2]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return charmNames[charmIDs.IndexOf(charmNum)];
+                    return _charmNames[CharmIDs.IndexOf(charmNum)];
                 }
             }
             else if (key.StartsWith("CHARM_DESC_"))
             {
                 int charmNum = int.Parse(key.Split('_')[2]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return charmDescriptions[charmIDs.IndexOf(charmNum)];
+                    return _charmDescriptions[CharmIDs.IndexOf(charmNum)];
                 }
             }
             return orig;
@@ -229,25 +229,25 @@ namespace MoreHealing
             if (target.StartsWith("gotCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return _saveSettings.gotCharms[charmIDs.IndexOf(charmNum)];
+                    return SaveSettings.gotCharms[CharmIDs.IndexOf(charmNum)];
                 }
             }
             if (target.StartsWith("newCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return _saveSettings.newCharms[charmIDs.IndexOf(charmNum)];
+                    return SaveSettings.newCharms[CharmIDs.IndexOf(charmNum)];
                 }
             }
             if (target.StartsWith("equippedCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return _saveSettings.equippedCharms[charmIDs.IndexOf(charmNum)];
+                    return SaveSettings.equippedCharms[CharmIDs.IndexOf(charmNum)];
                 }
             }
             return orig;
@@ -257,27 +257,27 @@ namespace MoreHealing
             if (target.StartsWith("gotCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    _saveSettings.gotCharms[charmIDs.IndexOf(charmNum)] = orig;
+                    SaveSettings.gotCharms[CharmIDs.IndexOf(charmNum)] = orig;
                     return orig;
                 }
             }
             if (target.StartsWith("newCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    _saveSettings.newCharms[charmIDs.IndexOf(charmNum)] = orig;
+                    SaveSettings.newCharms[CharmIDs.IndexOf(charmNum)] = orig;
                     return orig;
                 }
             }
             if (target.StartsWith("equippedCharm_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    _saveSettings.equippedCharms[charmIDs.IndexOf(charmNum)] = orig;
+                    SaveSettings.equippedCharms[CharmIDs.IndexOf(charmNum)] = orig;
                     return orig;
                 }
             }
@@ -288,9 +288,9 @@ namespace MoreHealing
             if (target.StartsWith("charmCost_"))
             {
                 int charmNum = int.Parse(target.Split('_')[1]);
-                if (charmIDs.Contains(charmNum))
+                if (CharmIDs.Contains(charmNum))
                 {
-                    return _saveSettings.charmCosts[charmIDs.IndexOf(charmNum)];
+                    return SaveSettings.charmCosts[CharmIDs.IndexOf(charmNum)];
                 }
             }
             return orig;

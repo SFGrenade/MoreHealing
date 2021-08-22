@@ -1,13 +1,11 @@
-﻿using Modding;
-
-namespace MoreHealing
+﻿namespace MoreHealing
 {
     class MhSettings
     {
         // insert default values here
-        public bool[] gotCharms = new bool[] { true, true, true, true };
-        public bool[] newCharms = new bool[] { false, false, false, false };
-        public bool[] equippedCharms = new bool[] { false, false, false, false };
-        public int[] charmCosts = new int[] { 4, 5, 5, 6 };
+        public bool[] gotCharms = new[] { true, true, true, true };
+        public bool[] newCharms = new[] { false, false, false, false };
+        public bool[] equippedCharms = new[] { false, false, false, false };
+        public int[] charmCosts = new[] { 4, 5, 5, 6 };
     }
 }
