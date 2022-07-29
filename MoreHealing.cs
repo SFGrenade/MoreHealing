@@ -176,8 +176,22 @@ namespace MoreHealing
             spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
             spellFsm.AddAction("Set HP Amount Deepest", iaa3);
 
+            spellFsm.CopyState("Set HP Amount 2", "Set HP Amount 2 Deeper");
+            spellFsm.RemoveAction("Set HP Amount 2 Deeper", 0);
+            spellFsm.RemoveAction("Set HP Amount 2 Deeper", 1);
+            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount 2 Deeper", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
+            spellFsm.AddAction("Set HP Amount 2 Deeper", iaa2);
+
+            spellFsm.CopyState("Set HP Amount 2", "Set HP Amount 2 Deepest");
+            spellFsm.RemoveAction("Set HP Amount 2 Deepest", 0);
+            spellFsm.RemoveAction("Set HP Amount 2 Deepest", 1);
+            spellFsm.GetAction<PlayerDataBoolTest>("Set HP Amount 2 Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
+            spellFsm.AddAction("Set HP Amount 2 Deepest", iaa3);
+
             spellFsm.ChangeTransition("Set HP Amount", FsmEvent.Finished.Name, "Set HP Amount Deeper");
             spellFsm.ChangeTransition("Set HP Amount Deeper", FsmEvent.Finished.Name, "Set HP Amount Deepest");
+            spellFsm.ChangeTransition("Set HP Amount 2", FsmEvent.Finished.Name, "Set HP Amount 2 Deeper");
+            spellFsm.ChangeTransition("Set HP Amount 2 Deeper", FsmEvent.Finished.Name, "Set HP Amount 2 Deepest");
 
             #endregion
 

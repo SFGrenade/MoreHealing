@@ -7,14 +7,14 @@
     <Product>MoreHealing</Product>
     <Description>A Hollow Knight Mod</Description>
     <Copyright>Copyright © SFGrenade 2019-2021</Copyright>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <AssemblyVersion>1.5.1.0</AssemblyVersion>
+    <FileVersion>1.5.1.0</FileVersion>
     <OutputPath>bin/$(Configuration)/</OutputPath>
     <LangVersion>latest</LangVersion>
     <NoWarn>8002</NoWarn>
-    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/</HollowKnightRefs>
+    <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Games/gog/hollow-knight/game/Hollow Knight_Data/Managed/</HollowKnightRefs>
     <HollowKnightRefs Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs>
-    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Projects/_Export/</ExportDir>
+    <ExportDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">/home/sfg/Documents/Projects/__Exports/</ExportDir>
     <ExportDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">E:/Github_Projects/__Exports/</ExportDir>
     <!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
   </PropertyGroup>
@@ -60,8 +60,8 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(HollowKnightRefs)/Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="GalaxyCSharp">
-      <HintPath>$(HollowKnightRefs)/GalaxyCSharp.dll</HintPath>
+    <Reference Include="ConditionalExpression">
+      <HintPath>$(HollowKnightRefs)/ConditionalExpression.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
       <HintPath>$(HollowKnightRefs)/MMHOOK_Assembly-CSharp.dll</HintPath>
@@ -72,14 +72,17 @@
     <Reference Include="Mono.Cecil">
       <HintPath>$(HollowKnightRefs)/Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Security">
-      <HintPath>$(HollowKnightRefs)/Mono.Security.dll</HintPath>
-    </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
       <HintPath>$(HollowKnightRefs)/MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>$(HollowKnightRefs)/MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>$(HollowKnightRefs)/Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>$(HollowKnightRefs)/mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>$(HollowKnightRefs)/netstandard.dll</HintPath>
@@ -96,8 +99,20 @@
     <Reference Include="System.Configuration">
       <HintPath>$(HollowKnightRefs)/System.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core">
+      <HintPath>$(HollowKnightRefs)/System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>$(HollowKnightRefs)/System.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System.Diagnostics.StackTrace">
       <HintPath>$(HollowKnightRefs)/System.Diagnostics.StackTrace.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>$(HollowKnightRefs)/System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>$(HollowKnightRefs)/System.Drawing.dll</HintPath>
     </Reference>
     <Reference Include="System.EnterpriseServices">
       <HintPath>$(HollowKnightRefs)/System.EnterpriseServices.dll</HintPath>
@@ -108,8 +123,17 @@
     <Reference Include="System.IO.Compression">
       <HintPath>$(HollowKnightRefs)/System.IO.Compression.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Compression.FileSystem">
+      <HintPath>$(HollowKnightRefs)/System.IO.Compression.FileSystem.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>$(HollowKnightRefs)/System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics">
+      <HintPath>$(HollowKnightRefs)/System.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>$(HollowKnightRefs)/System.Runtime.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization.Xml">
       <HintPath>$(HollowKnightRefs)/System.Runtime.Serialization.Xml.dll</HintPath>
@@ -120,14 +144,14 @@
     <Reference Include="System.Transactions">
       <HintPath>$(HollowKnightRefs)/System.Transactions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>$(HollowKnightRefs)/System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>$(HollowKnightRefs)/System.Xml.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>$(HollowKnightRefs)/System.Xml.XPath.XDocument.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>$(HollowKnightRefs)/Unity.Timeline.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(HollowKnightRefs)/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.AccessibilityModule.dll</HintPath>
@@ -140,9 +164,6 @@
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ARModule">
-      <HintPath>$(HollowKnightRefs)/UnityEngine.ARModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.AssetBundleModule.dll</HintPath>
@@ -167,6 +188,9 @@
     </Reference>
     <Reference Include="UnityEngine.DirectorModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(HollowKnightRefs)/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.DSPGraphModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.DSPGraphModule.dll</HintPath>
@@ -323,6 +347,12 @@
     </Reference>
     <Reference Include="UnityEngine.XRModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline">
+      <HintPath>$(HollowKnightRefs)/Unity.Timeline.dll</HintPath>
+    </Reference>
+    <Reference Include="zlib.net">
+      <HintPath>$(HollowKnightRefs)/zlib.net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
