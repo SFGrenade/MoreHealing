@@ -69,17 +69,7 @@ namespace MoreHealing
             //ModHooks.Instance.CharmUpdateHook += OnCharmUpdateHook;
 
             On.HeroController.Start += OnHeroControllerStart;
-            On.GameManager.Update += GameManagerUpdate;
         }
-
-        #region Mod Reload
-
-        private void GameManagerUpdate(On.GameManager.orig_Update orig, GameManager self)
-        {
-            orig(self);
-        }
-
-        #endregion
 
         private bool _changed = false;
         private void OnHeroControllerStart(On.HeroController.orig_Start orig, HeroController self)
