@@ -21,27 +21,7 @@ namespace MoreHealing
         public TextureStrings Ts { get; private set; }
         public List<int> CharmIDs { get; private set; }
 
-        // Thx to 56
-        public override string GetVersion()
-        {
-            Assembly asm = Assembly.GetExecutingAssembly();
-
-            string ver = asm.GetName().Version.ToString();
-
-            SHA1 sha1 = SHA1.Create();
-            FileStream stream = File.OpenRead(asm.Location);
-
-            byte[] hashBytes = sha1.ComputeHash(stream);
-
-            string hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-
-            stream.Close();
-            sha1.Clear();
-
-            string ret = $"{ver}-{hash.Substring(0, 6)}";
-
-            return ret;
-        }
+        public override string GetVersion() => SFCore.Utils.Util.GetVersion(Assembly.GetExecutingAssembly());
 
         public MoreHealing() : base("More Healing")
         {
@@ -64,37 +44,19 @@ namespace MoreHealing
             ModHooks.GetPlayerBoolHook += OnGetPlayerBoolHook;
             ModHooks.SetPlayerBoolHook += OnSetPlayerBoolHook;
             ModHooks.GetPlayerIntHook += OnGetPlayerIntHook;
-            ModHooks.AfterSavegameLoadHook += InitSaveSettings;
             ModHooks.LanguageGetHook += OnLanguageGetHook;
-            //ModHooks.Instance.CharmUpdateHook += OnCharmUpdateHook;
 
             On.HeroController.Start += OnHeroControllerStart;
         }
 
-        private bool _changed = false;
         private void OnHeroControllerStart(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
-            if (_changed) return;
-            _changed = true;
 
-            self.StartCoroutine(AddCharmStates(self));
-
-            _changed = true;
-        }
-        private void InitSaveSettings(SaveGameData data)
-        {
-            // Found in a project, might help saving, don't know, but who cares
-            // Charms
-            SaveSettings.gotCharms = SaveSettings.gotCharms;
-            SaveSettings.newCharms = SaveSettings.newCharms;
-            SaveSettings.equippedCharms = SaveSettings.equippedCharms;
-            SaveSettings.charmCosts = SaveSettings.charmCosts;
-
-            _changed = false;
+            AddCharmStates(self);
         }
 
-        private IEnumerator AddCharmStates(HeroController self)
+        private void AddCharmStates(HeroController self)
         {
             var spellFsm = self.gameObject.LocateMyFSM("Spell Control");
             var spellFsmVar = spellFsm.FsmVariables;
@@ -184,8 +146,6 @@ namespace MoreHealing
             spellFsm.ChangeTransition("Set HP Amount 2 Deeper", FsmEvent.Finished.Name, "Set HP Amount 2 Deepest");
 
             #endregion
-
-            yield break;
         }
 
         #region ModHooks
@@ -196,8 +156,6 @@ namespace MoreHealing
             "Quickest Focus",
             "Deeper Focus",
             "Deepest Focus",
-            "Temp",
-            "Temp"
         };
         private string[] _charmDescriptions =
         {
@@ -205,8 +163,6 @@ namespace MoreHealing
             "A very dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage faster than nothing else.",
             "Naturally formed within a crystal over a longer period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will triple.",
             "Naturally formed within a crystal over the longest period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will quadruple.",
-            "Temp",
-            "Temp"
         };
         private string OnLanguageGetHook(string key, string sheet, string orig)
         {
