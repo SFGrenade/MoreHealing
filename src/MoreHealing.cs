@@ -56,7 +56,32 @@ class MoreHealing : SaveSettingsMod<MhSettings>
     {
         var spellFsm = self.gameObject.LocateMyFSM("Spell Control");
 
-        #region Quick Focus Speeds
+        AddQuickFocusSpeeds(spellFsm);
+
+        AddDeepFocusSpeeds(spellFsm);
+
+        AddDeepFocusHpAmounts(spellFsm);
+
+        AddQuickFocusShapeOfUnn(spellFsm);
+
+        AddDeepFocusSporeShroom(spellFsm);
+
+        /*
+        spellFsm.Preprocess();
+
+        spellFsm.Log();
+        spellFsm.MakeLog();
+
+        spellFsm.Preprocess();
+        */
+    }
+
+    private void AddQuickFocusSpeeds(PlayMakerFSM spellFsm)
+    {
+        if (spellFsm.FsmStates[0].Fsm == null)
+        {
+            spellFsm.Preprocess();
+        }
 
         spellFsm.GetState("Set Focus Speed").SaveActions();
 
@@ -80,10 +105,14 @@ class MoreHealing : SaveSettingsMod<MhSettings>
 
         spellFsm.ChangeTransition("Set Focus Speed", FsmEvent.Finished.Name, "Set QuickerFocus Speed");
         spellFsm.ChangeTransition("Set QuickerFocus Speed", FsmEvent.Finished.Name, "Set QuickestFocus Speed");
+    }
 
-        #endregion
-
-        #region Deep Focus Speeds
+    private void AddDeepFocusSpeeds(PlayMakerFSM spellFsm)
+    {
+        if (spellFsm.FsmStates[0].Fsm == null)
+        {
+            spellFsm.Preprocess();
+        }
 
         spellFsm.GetState("Deep Focus Speed").SaveActions();
 
@@ -99,10 +128,14 @@ class MoreHealing : SaveSettingsMod<MhSettings>
 
         spellFsm.ChangeTransition("Deep Focus Speed", FsmEvent.Finished.Name, "Deeper Focus Speed");
         spellFsm.ChangeTransition("Deeper Focus Speed", FsmEvent.Finished.Name, "Deepest Focus Speed");
+    }
 
-        #endregion
-
-        #region Hp Amounts
+    private void AddDeepFocusHpAmounts(PlayMakerFSM spellFsm)
+    {
+        if (spellFsm.FsmStates[0].Fsm == null)
+        {
+            spellFsm.Preprocess();
+        }
 
         spellFsm.GetState("Set HP Amount").SaveActions();
 
@@ -136,12 +169,15 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         spellFsm.ChangeTransition("Set HP Amount 2", FsmEvent.Finished.Name, "Set HP Amount 2 Deeper");
         spellFsm.ChangeTransition("Set HP Amount 2 Deeper", FsmEvent.Finished.Name, "Set HP Amount 2 Deepest");
         spellFsm.ChangeTransition("Set HP Amount 2 Deepest", FsmEvent.Finished.Name, "Focus Heal 2");
+    }
 
-        #endregion
+    private void AddQuickFocusShapeOfUnn(PlayMakerFSM spellFsm)
+    {
+        if (spellFsm.FsmStates[0].Fsm == null)
+        {
+            spellFsm.Preprocess();
+        }
 
-        #region shape of unn
-
-        FloatAdd floatAdd = new FloatAdd();
         spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 0).isFalse = null;
         spellFsm.AddAction("Slug?", spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 0));
         spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 1).boolName = $"equippedCharm_{CharmIDs[0]}";
@@ -204,22 +240,44 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         spellFsm.ChangeTransition("Slug Speed Quicker", FsmEvent.Finished.Name, "Slug Speed Quickest");
         spellFsm.AddTransition("Slug Speed Quickest", FsmEvent.Finished.Name, "Anim Check");
         spellFsm.ChangeTransition("Slug Speed Quickest", FsmEvent.Finished.Name, "Anim Check");
+    }
 
-        #endregion
-
-        #region spore shroom
-
-        GameObject sporeCloudGo = spellFsm.GetAction<SpawnObjectFromGlobalPool>("Spore Cloud", 3).gameObject.Value;
-        GameObject dungCloudGo = spellFsm.GetAction<SpawnObjectFromGlobalPool>("Dung Cloud", 0).gameObject.Value;
-
-        var sporeCloudFsm = sporeCloudGo.LocateMyFSM("Control");
-        if (sporeCloudFsm.FsmStates[0].Fsm == null)
+    private void AddDeepFocusSporeShroom(PlayMakerFSM spellFsm)
+    {
+        if (spellFsm.FsmStates[0].Fsm == null)
         {
-            sporeCloudFsm.Preprocess();
+            spellFsm.Preprocess();
         }
-        var sporeCloudDeepEvent = sporeCloudFsm.GetTransition("Init", "DEEP").FsmEvent;
-        sporeCloudFsm.GetAction<PlayerDataBoolTest>("Init", 2).isFalse = null;
-        sporeCloudFsm.AddAction("Init", new PlayerDataBoolTest
+
+        GameObject sporeCloudOrigGo = spellFsm.GetAction<SpawnObjectFromGlobalPool>("Spore Cloud", 3).gameObject.Value;
+        GameObject dungCloudOrigGo = spellFsm.GetAction<SpawnObjectFromGlobalPool>("Dung Cloud", 0).gameObject.Value;
+
+        foreach (GameObject sporeCloudGo in sporeCloudOrigGo.GetPooled())
+        {
+            var sporeCloudFsm = sporeCloudGo.LocateMyFSM("Control");
+            AddDeepFocusSporeShroomCloud(sporeCloudFsm);
+        }
+
+        foreach (GameObject dungCloudGo in dungCloudOrigGo.GetPooled())
+        {
+            var dungCloudFsm = dungCloudGo.LocateMyFSM("Control");
+            AddDeepFocusSporeShroomCloud(dungCloudFsm);
+        }
+
+        AddDeepFocusSporeShroomCloud(sporeCloudOrigGo.LocateMyFSM("Control"));
+        AddDeepFocusSporeShroomCloud(dungCloudOrigGo.LocateMyFSM("Control"));
+    }
+
+    private void AddDeepFocusSporeShroomCloud(PlayMakerFSM cloudFsm)
+    {
+        if (cloudFsm.FsmStates[0].Fsm == null)
+        {
+            cloudFsm.Preprocess();
+        }
+
+        var cloudDeepEvent = cloudFsm.GetTransition("Init", "DEEP").FsmEvent;
+        cloudFsm.GetAction<PlayerDataBoolTest>("Init", 2).isFalse = null;
+        cloudFsm.AddAction("Init", new PlayerDataBoolTest
         {
             gameObject = new FsmOwnerDefault
             {
@@ -227,10 +285,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 GameObject = GameManager.instance.gameObject
             },
             boolName = $"equippedCharm_{CharmIDs[2]}",
-            isTrue = sporeCloudDeepEvent,
+            isTrue = cloudDeepEvent,
             isFalse = null
         });
-        sporeCloudFsm.AddAction("Init", new PlayerDataBoolTest
+        cloudFsm.AddAction("Init", new PlayerDataBoolTest
         {
             gameObject = new FsmOwnerDefault
             {
@@ -238,18 +296,18 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 GameObject = GameManager.instance.gameObject
             },
             boolName = $"equippedCharm_{CharmIDs[3]}",
-            isTrue = sporeCloudDeepEvent,
+            isTrue = cloudDeepEvent,
             isFalse = null
         });
-        sporeCloudFsm.GetState("Init").SaveActions();
+        cloudFsm.GetState("Init").SaveActions();
 
-        FsmFloat sporeCloudXScale = sporeCloudFsm.GetFloatVariable("X Scale");
-        FsmFloat sporeCloudYScale = sporeCloudFsm.GetFloatVariable("Y Scale");
-        sporeCloudXScale.Value = 1f;
-        sporeCloudYScale.Value = 1f;
+        FsmFloat cloudXScale = cloudFsm.GetFloatVariable("X Scale");
+        FsmFloat cloudYScale = cloudFsm.GetFloatVariable("Y Scale");
+        cloudXScale.Value = 1f;
+        cloudYScale.Value = 1f;
 
-        sporeCloudFsm.RemoveAction("Deep", 1);
-        sporeCloudFsm.AddAction("Deep", new PlayerDataBoolTest
+        cloudFsm.RemoveAction("Deep", 1);
+        cloudFsm.AddAction("Deep", new PlayerDataBoolTest
         {
             gameObject = new FsmOwnerDefault
             {
@@ -259,153 +317,57 @@ class MoreHealing : SaveSettingsMod<MhSettings>
             boolName = $"equippedCharm_34",
             isFalse = FsmEvent.Finished
         });
-        sporeCloudFsm.AddAction("Deep", new FloatMultiply
+        cloudFsm.AddAction("Deep", new FloatMultiply
         {
-            floatVariable = sporeCloudXScale,
+            floatVariable = cloudXScale,
             multiplyBy = 1.35f
         });
-        sporeCloudFsm.AddAction("Deep", new FloatMultiply
+        cloudFsm.AddAction("Deep", new FloatMultiply
         {
-            floatVariable = sporeCloudYScale,
+            floatVariable = cloudYScale,
             multiplyBy = 1.35f
         });
-        sporeCloudFsm.GetState("Deep").SaveActions();
+        cloudFsm.GetState("Deep").SaveActions();
 
-        sporeCloudFsm.CopyState("Deep", "Deeper");
-        sporeCloudFsm.RemoveAction("Deeper", 0);
-        sporeCloudFsm.GetAction<PlayerDataBoolTest>("Deeper", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
-        sporeCloudFsm.GetAction<FloatMultiply>("Deeper", 1).multiplyBy = Mathf.Pow(1.35f, 2f);
-        sporeCloudFsm.GetAction<FloatMultiply>("Deeper", 2).multiplyBy = Mathf.Pow(1.35f, 2f);
-        sporeCloudFsm.GetState("Deeper").SaveActions();
+        cloudFsm.CopyState("Deep", "Deeper");
+        cloudFsm.RemoveAction("Deeper", 0);
+        cloudFsm.GetAction<PlayerDataBoolTest>("Deeper", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
+        cloudFsm.GetAction<FloatMultiply>("Deeper", 1).multiplyBy = Mathf.Pow(1.35f, 2f);
+        cloudFsm.GetAction<FloatMultiply>("Deeper", 2).multiplyBy = Mathf.Pow(1.35f, 2f);
+        cloudFsm.GetState("Deeper").SaveActions();
 
-        sporeCloudFsm.CopyState("Deeper", "Deepest");
-        sporeCloudFsm.GetAction<PlayerDataBoolTest>("Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
-        sporeCloudFsm.GetAction<FloatMultiply>("Deepest", 1).multiplyBy = Mathf.Pow(1.35f, 3f);
-        sporeCloudFsm.GetAction<FloatMultiply>("Deepest", 2).multiplyBy = Mathf.Pow(1.35f, 3f);
-        sporeCloudFsm.GetState("Deepest").SaveActions();
+        cloudFsm.CopyState("Deeper", "Deepest");
+        cloudFsm.GetAction<PlayerDataBoolTest>("Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
+        cloudFsm.GetAction<FloatMultiply>("Deepest", 1).multiplyBy = Mathf.Pow(1.35f, 3f);
+        cloudFsm.GetAction<FloatMultiply>("Deepest", 2).multiplyBy = Mathf.Pow(1.35f, 3f);
+        cloudFsm.GetState("Deepest").SaveActions();
 
-        sporeCloudFsm.AddState("Apply Scale");
-        sporeCloudFsm.AddAction("Apply Scale", new SetScale
+        cloudFsm.AddState("Apply Scale");
+        cloudFsm.AddAction("Apply Scale", new SetScale
         {
             gameObject = new FsmOwnerDefault
             {
-                OwnerOption = OwnerDefaultOption.UseOwner
+                OwnerOption = OwnerDefaultOption.UseOwner,
+                GameObject = cloudFsm.gameObject
             },
-            x = sporeCloudXScale,
-            y = sporeCloudYScale
+            vector = new FsmVector3(),
+            x = cloudXScale,
+            y = cloudYScale,
+            z = new FsmFloat()
         });
-        sporeCloudFsm.GetState("Apply Scale").SaveActions();
+        cloudFsm.GetState("Apply Scale").SaveActions();
 
-        sporeCloudFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
-        sporeCloudFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
-        sporeCloudFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
-        sporeCloudFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, "Wait");
+        cloudFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
+        cloudFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
+        cloudFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
+        cloudFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, "Wait");
 
-        var dungCloudFsm = dungCloudGo.LocateMyFSM("Control");
-        if (dungCloudFsm.FsmStates[0].Fsm == null)
-        {
-            dungCloudFsm.Preprocess();
-        }
-        var dungCloudDeepEvent = dungCloudFsm.GetTransition("Init", "DEEP").FsmEvent;
-        dungCloudFsm.GetAction<PlayerDataBoolTest>("Init", 2).isFalse = null;
-        dungCloudFsm.AddAction("Init", new PlayerDataBoolTest
-        {
-            gameObject = new FsmOwnerDefault
-            {
-                OwnerOption = OwnerDefaultOption.SpecifyGameObject,
-                GameObject = GameManager.instance.gameObject
-            },
-            boolName = $"equippedCharm_{CharmIDs[2]}",
-            isTrue = dungCloudDeepEvent,
-            isFalse = null
-        });
-        dungCloudFsm.AddAction("Init", new PlayerDataBoolTest
-        {
-            gameObject = new FsmOwnerDefault
-            {
-                OwnerOption = OwnerDefaultOption.SpecifyGameObject,
-                GameObject = GameManager.instance.gameObject
-            },
-            boolName = $"equippedCharm_{CharmIDs[3]}",
-            isTrue = dungCloudDeepEvent,
-            isFalse = null
-        });
-        dungCloudFsm.GetState("Init").SaveActions();
-
-        FsmFloat dungCloudXScale = dungCloudFsm.GetFloatVariable("X Scale");
-        FsmFloat dungCloudYScale = dungCloudFsm.GetFloatVariable("Y Scale");
-        dungCloudXScale.Value = 1f;
-        dungCloudYScale.Value = 1f;
-
-        dungCloudFsm.RemoveAction("Deep", 1);
-        dungCloudFsm.AddAction("Deep", new PlayerDataBoolTest
-        {
-            gameObject = new FsmOwnerDefault
-            {
-                OwnerOption = OwnerDefaultOption.SpecifyGameObject,
-                GameObject = GameManager.instance.gameObject
-            },
-            boolName = $"equippedCharm_34",
-            isFalse = FsmEvent.Finished
-        });
-        dungCloudFsm.AddAction("Deep", new FloatMultiply
-        {
-            floatVariable = dungCloudXScale,
-            multiplyBy = 1.35f
-        });
-        dungCloudFsm.AddAction("Deep", new FloatMultiply
-        {
-            floatVariable = dungCloudYScale,
-            multiplyBy = 1.35f
-        });
-        dungCloudFsm.GetState("Deep").SaveActions();
-
-        dungCloudFsm.CopyState("Deep", "Deeper");
-        dungCloudFsm.RemoveAction("Deeper", 0);
-        dungCloudFsm.GetAction<PlayerDataBoolTest>("Deeper", 0).boolName = $"equippedCharm_{CharmIDs[2]}";
-        dungCloudFsm.GetAction<FloatMultiply>("Deeper", 1).multiplyBy = Mathf.Pow(1.35f, 2f);
-        dungCloudFsm.GetAction<FloatMultiply>("Deeper", 2).multiplyBy = Mathf.Pow(1.35f, 2f);
-        dungCloudFsm.GetState("Deeper").SaveActions();
-
-        dungCloudFsm.CopyState("Deeper", "Deepest");
-        dungCloudFsm.GetAction<PlayerDataBoolTest>("Deepest", 0).boolName = $"equippedCharm_{CharmIDs[3]}";
-        dungCloudFsm.GetAction<FloatMultiply>("Deepest", 1).multiplyBy = Mathf.Pow(1.35f, 3f);
-        dungCloudFsm.GetAction<FloatMultiply>("Deepest", 2).multiplyBy = Mathf.Pow(1.35f, 3f);
-        dungCloudFsm.GetState("Deepest").SaveActions();
-
-        dungCloudFsm.AddState("Apply Scale");
-        dungCloudFsm.AddAction("Apply Scale", new SetScale
-        {
-            gameObject = new FsmOwnerDefault
-            {
-                OwnerOption = OwnerDefaultOption.UseOwner
-            },
-            x = dungCloudXScale,
-            y = dungCloudYScale
-        });
-        dungCloudFsm.GetState("Apply Scale").SaveActions();
-
-        dungCloudFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
-        dungCloudFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
-        dungCloudFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
-        dungCloudFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, "Wait");
-
-        #endregion
-
-        spellFsm.Preprocess();
-        sporeCloudFsm.Preprocess();
-        dungCloudFsm.Preprocess();
-
-        spellFsm.Log();
-        sporeCloudFsm.Log();
-        dungCloudFsm.Log();
-        spellFsm.MakeLog();
-        sporeCloudFsm.MakeLog();
-        dungCloudFsm.MakeLog();
-
-        spellFsm.Preprocess();
-        sporeCloudFsm.Preprocess();
-        dungCloudFsm.Preprocess();
+        /*
+        cloudFsm.Preprocess();
+        cloudFsm.Log();
+        cloudFsm.MakeLog();
+        cloudFsm.Preprocess();
+        */
     }
 
     #region ModHooks
