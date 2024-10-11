@@ -13,7 +13,6 @@ namespace MoreHealing;
 
 class MoreHealing : SaveSettingsMod<MhSettings>
 {
-
     public TextureStrings Ts { get; private set; }
     public List<int> CharmIDs { get; private set; }
 
@@ -28,7 +27,8 @@ class MoreHealing : SaveSettingsMod<MhSettings>
     {
         Log("Initializing");
 
-        CharmIDs = CharmHelper.AddSprites(Ts.Get(TextureStrings.QuickerFocusKey), Ts.Get(TextureStrings.QuickestFocusKey), Ts.Get(TextureStrings.DeeperFocusKey), Ts.Get(TextureStrings.DeepestFocusKey));
+        CharmIDs = CharmHelper.AddSprites(Ts.Get(TextureStrings.QuickerFocusKey), Ts.Get(TextureStrings.QuickestFocusKey),
+            Ts.Get(TextureStrings.DeeperFocusKey), Ts.Get(TextureStrings.DeepestFocusKey));
 
         InitCallbacks();
 
@@ -95,12 +95,12 @@ class MoreHealing : SaveSettingsMod<MhSettings>
             floatVariable = spellFsm.GetFloatVariable("Time Per MP Drain"),
             multiplyBy = 2f / 3f
         });
-        spellFsm.GetAction<FloatMultiply>("Set QuickerFocus Speed", 2).multiplyBy = Mathf.Pow(2f/3f, 2);
+        spellFsm.GetAction<FloatMultiply>("Set QuickerFocus Speed", 2).multiplyBy = Mathf.Pow(2f / 3f, 2);
         spellFsm.GetState("Set QuickerFocus Speed").SaveActions();
 
         spellFsm.CopyState("Set QuickerFocus Speed", "Set QuickestFocus Speed");
         spellFsm.GetAction<PlayerDataBoolTest>("Set QuickestFocus Speed", 0).boolName = $"equippedCharm_{CharmIDs[1]}";
-        spellFsm.GetAction<FloatMultiply>("Set QuickestFocus Speed", 2).multiplyBy = Mathf.Pow(2f/3f, 3);
+        spellFsm.GetAction<FloatMultiply>("Set QuickestFocus Speed", 2).multiplyBy = Mathf.Pow(2f / 3f, 3);
         spellFsm.GetState("Set QuickestFocus Speed").SaveActions();
 
         spellFsm.ChangeTransition("Set Focus Speed", FsmEvent.Finished.Name, "Set QuickerFocus Speed");
@@ -379,6 +379,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         "Deeper Focus",
         "Deepest Focus",
     };
+
     private string[] _charmDescriptions =
     {
         "A dense charm containing a crystal lens.<br><br>Increases the speed of focusing SOUL, allowing the bearer to heal damage even faster.",
@@ -386,6 +387,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         "Naturally formed within a crystal over a longer period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will triple.",
         "Naturally formed within a crystal over the longest period. Draws in SOUL from the surrounding air.<br><br>The bearer will focus SOUL at a slower rate, but the healing effect will quadruple.",
     };
+
     private string OnLanguageGetHook(string key, string sheet, string orig)
     {
         if (key.StartsWith("CHARM_NAME_"))
@@ -404,8 +406,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return _charmDescriptions[CharmIDs.IndexOf(charmNum)];
             }
         }
+
         return orig;
     }
+
     private bool OnGetPlayerBoolHook(string target, bool orig)
     {
         if (target.StartsWith("gotCharm_"))
@@ -416,6 +420,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return SaveSettings.gotCharms[CharmIDs.IndexOf(charmNum)];
             }
         }
+
         if (target.StartsWith("newCharm_"))
         {
             int charmNum = int.Parse(target.Split('_')[1]);
@@ -424,6 +429,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return SaveSettings.newCharms[CharmIDs.IndexOf(charmNum)];
             }
         }
+
         if (target.StartsWith("equippedCharm_"))
         {
             int charmNum = int.Parse(target.Split('_')[1]);
@@ -432,8 +438,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return SaveSettings.equippedCharms[CharmIDs.IndexOf(charmNum)];
             }
         }
+
         return orig;
     }
+
     private bool OnSetPlayerBoolHook(string target, bool orig)
     {
         if (target.StartsWith("gotCharm_"))
@@ -445,6 +453,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return orig;
             }
         }
+
         if (target.StartsWith("newCharm_"))
         {
             int charmNum = int.Parse(target.Split('_')[1]);
@@ -454,6 +463,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return orig;
             }
         }
+
         if (target.StartsWith("equippedCharm_"))
         {
             int charmNum = int.Parse(target.Split('_')[1]);
@@ -463,8 +473,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return orig;
             }
         }
+
         return orig;
     }
+
     private int OnGetPlayerIntHook(string target, int orig)
     {
         if (target.StartsWith("charmCost_"))
@@ -475,6 +487,7 @@ class MoreHealing : SaveSettingsMod<MhSettings>
                 return SaveSettings.charmCosts[CharmIDs.IndexOf(charmNum)];
             }
         }
+
         return orig;
     }
 
