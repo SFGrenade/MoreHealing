@@ -21,16 +21,16 @@ class MoreHealing : SaveSettingsMod<MhSettings>
     public MoreHealing() : base("More Healing")
     {
         Ts = new TextureStrings();
-    }
-
-    public override void Initialize()
-    {
-        Log("Initializing");
 
         CharmIDs = CharmHelper.AddSprites(Ts.Get(TextureStrings.QuickerFocusKey), Ts.Get(TextureStrings.QuickestFocusKey),
             Ts.Get(TextureStrings.DeeperFocusKey), Ts.Get(TextureStrings.DeepestFocusKey));
 
         InitCallbacks();
+    }
+
+    public override void Initialize()
+    {
+        Log("Initializing");
 
         Log("Initialized");
     }
