@@ -366,11 +366,11 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         });
         cloudFsm.GetState("Apply Scale").SaveActions();
 
-        var deepFinishedTarget = spellFsm.GetTransition("Deep", FsmEvent.Finished.Name).ToFsmState;
-        spellFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
-        spellFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
-        spellFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
-        spellFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, deepFinishedTarget.Name);
+        var deepFinishedTarget = cloudFsm.GetTransition("Deep", FsmEvent.Finished.Name).ToFsmState;
+        cloudFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
+        cloudFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
+        cloudFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
+        cloudFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, deepFinishedTarget.Name);
 
         /*
         cloudFsm.Preprocess();
