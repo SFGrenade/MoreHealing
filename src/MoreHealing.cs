@@ -103,8 +103,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         spellFsm.GetAction<FloatMultiply>("Set QuickestFocus Speed", 2).multiplyBy = Mathf.Pow(2f / 3f, 3);
         spellFsm.GetState("Set QuickestFocus Speed").SaveActions();
 
+        var setFocusSpeedFinishedTarget = spellFsm.GetTransition("Set Focus Speed", FsmEvent.Finished.Name).ToFsmState;
         spellFsm.ChangeTransition("Set Focus Speed", FsmEvent.Finished.Name, "Set QuickerFocus Speed");
         spellFsm.ChangeTransition("Set QuickerFocus Speed", FsmEvent.Finished.Name, "Set QuickestFocus Speed");
+        spellFsm.ChangeTransition("Set QuickestFocus Speed", FsmEvent.Finished.Name, setFocusSpeedFinishedTarget.Name);
     }
 
     private void AddDeepFocusSpeeds(PlayMakerFSM spellFsm)
@@ -126,8 +128,10 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         spellFsm.GetAction<FloatMultiply>("Deepest Focus Speed", 1).multiplyBy = Mathf.Pow(1.65f, 3);
         spellFsm.GetState("Deepest Focus Speed").SaveActions();
 
+        var deepFocusSpeedFinishedTarget = spellFsm.GetTransition("Deep Focus Speed", FsmEvent.Finished.Name).ToFsmState;
         spellFsm.ChangeTransition("Deep Focus Speed", FsmEvent.Finished.Name, "Deeper Focus Speed");
         spellFsm.ChangeTransition("Deeper Focus Speed", FsmEvent.Finished.Name, "Deepest Focus Speed");
+        spellFsm.ChangeTransition("Deepest Focus Speed", FsmEvent.Finished.Name, deepFocusSpeedFinishedTarget.Name);
     }
 
     private void AddDeepFocusHpAmounts(PlayMakerFSM spellFsm)
@@ -163,12 +167,14 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         spellFsm.GetAction<IntAdd>("Set HP Amount 2 Deepest", 1).add = 3;
         spellFsm.GetState("Set HP Amount 2 Deepest").SaveActions();
 
+        var setHpAmountFinishedTarget = spellFsm.GetTransition("Set HP Amount", FsmEvent.Finished.Name).ToFsmState;
+        var setHpAmount2FinishedTarget = spellFsm.GetTransition("Set HP Amount 2", FsmEvent.Finished.Name).ToFsmState;
         spellFsm.ChangeTransition("Set HP Amount", FsmEvent.Finished.Name, "Set HP Amount Deeper");
         spellFsm.ChangeTransition("Set HP Amount Deeper", FsmEvent.Finished.Name, "Set HP Amount Deepest");
-        spellFsm.ChangeTransition("Set HP Amount Deepest", FsmEvent.Finished.Name, "Focus Heal");
+        spellFsm.ChangeTransition("Set HP Amount Deepest", FsmEvent.Finished.Name, setHpAmountFinishedTarget.Name);
         spellFsm.ChangeTransition("Set HP Amount 2", FsmEvent.Finished.Name, "Set HP Amount 2 Deeper");
         spellFsm.ChangeTransition("Set HP Amount 2 Deeper", FsmEvent.Finished.Name, "Set HP Amount 2 Deepest");
-        spellFsm.ChangeTransition("Set HP Amount 2 Deepest", FsmEvent.Finished.Name, "Focus Heal 2");
+        spellFsm.ChangeTransition("Set HP Amount 2 Deepest", FsmEvent.Finished.Name, setHpAmount2FinishedTarget.Name);
     }
 
     private void AddQuickFocusShapeOfUnn(PlayMakerFSM spellFsm)
@@ -235,11 +241,14 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         });
         spellFsm.GetState("Slug Speed Quickest").SaveActions();
 
+        var slugSpeedFinishedTarget = spellFsm.GetTransition("Slug Speed", FsmEvent.Finished.Name).ToFsmState;
         spellFsm.ChangeTransition("Slug Speed", FsmEvent.Finished.Name, "Slug Speed Quicker");
+
         spellFsm.AddTransition("Slug Speed Quicker", FsmEvent.Finished.Name, "Slug Speed Quickest");
         spellFsm.ChangeTransition("Slug Speed Quicker", FsmEvent.Finished.Name, "Slug Speed Quickest");
-        spellFsm.AddTransition("Slug Speed Quickest", FsmEvent.Finished.Name, "Anim Check");
-        spellFsm.ChangeTransition("Slug Speed Quickest", FsmEvent.Finished.Name, "Anim Check");
+
+        spellFsm.AddTransition("Slug Speed Quickest", FsmEvent.Finished.Name, slugSpeedFinishedTarget.Name);
+        spellFsm.ChangeTransition("Slug Speed Quickest", FsmEvent.Finished.Name, slugSpeedFinishedTarget.Name);
     }
 
     private void AddDeepFocusSporeShroom(PlayMakerFSM spellFsm)
@@ -357,10 +366,11 @@ class MoreHealing : SaveSettingsMod<MhSettings>
         });
         cloudFsm.GetState("Apply Scale").SaveActions();
 
-        cloudFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
-        cloudFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
-        cloudFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
-        cloudFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, "Wait");
+        var deepFinishedTarget = spellFsm.GetTransition("Deep", FsmEvent.Finished.Name).ToFsmState;
+        spellFsm.ChangeTransition("Deep", FsmEvent.Finished.Name, "Deeper");
+        spellFsm.ChangeTransition("Deeper", FsmEvent.Finished.Name, "Deepest");
+        spellFsm.ChangeTransition("Deepest", FsmEvent.Finished.Name, "Apply Scale");
+        spellFsm.AddTransition("Apply Scale", FsmEvent.Finished.Name, deepFinishedTarget.Name);
 
         /*
         cloudFsm.Preprocess();
