@@ -33,7 +33,7 @@ public class TextureStrings
             //Create texture from bytes
             var tex = new Texture2D(2, 2);
 
-            string filePath = Path.Combine(_dir, t);
+            string filePath = Path.Combine(_dir, $"{t}.png");
             if (Directory.Exists(_dir) && File.Exists(filePath))
             {
                 // when file exists, use that
