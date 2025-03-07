@@ -184,19 +184,35 @@ class MoreHealing : SaveSettingsMod<MhSettings>
             spellFsm.Preprocess();
         }
 
-        spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 0).isFalse = null;
-        spellFsm.AddAction("Slug?", spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 0));
-        spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 1).boolName = $"equippedCharm_{CharmIDs[0]}";
-        spellFsm.AddAction("Slug?", spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 0));
-        spellFsm.GetAction<PlayerDataBoolTest>("Slug?", 2).boolName = $"equippedCharm_{CharmIDs[1]}";
-        spellFsm.AddMethod("Slug?", () =>
+        spellFsm.RemoveAction("Speedup?", 0);
+        spellFsm.InsertAction("Speedup?", new PlayerDataBoolAnyTrue()
+        {
+            gameObject = new FsmOwnerDefault
+            {
+                OwnerOption = OwnerDefaultOption.SpecifyGameObject,
+                GameObject = GameManager.instance.gameObject
+            },
+            boolNames = ["equippedCharm_7", $"equippedCharm_{CharmIDs[0]}", $"equippedCharm_{CharmIDs[1]}"],
+            isTrue = null,
+            isFalse = FsmEvent.Finished
+        }, 0);
+        spellFsm.GetState("Speedup?").SaveActions();
+
+        spellFsm.InsertMethod("Slug Speed", () =>
+        {
+            var slugSpeedL = spellFsm.GetFloatVariable("Slug Speed L").Value;
+            var slugSpeedR = spellFsm.GetFloatVariable("Slug Speed R").Value;
+            Log($"Slug Speed L set to {slugSpeedL}");
+            Log($"Slug Speed R set to {slugSpeedR}");
+        }, 5);
+        spellFsm.AddMethod("Slug Speed", () =>
         {
             var slugSpeedL = spellFsm.GetFloatVariable("Slug Speed L").Value;
             var slugSpeedR = spellFsm.GetFloatVariable("Slug Speed R").Value;
             Log($"Slug Speed L set to {slugSpeedL}");
             Log($"Slug Speed R set to {slugSpeedR}");
         });
-        spellFsm.GetState("Slug?").SaveActions();
+        spellFsm.GetState("Slug Speed").SaveActions();
 
         spellFsm.AddState("Slug Speed Quicker");
         spellFsm.AddAction("Slug Speed Quicker", new PlayerDataBoolTest
